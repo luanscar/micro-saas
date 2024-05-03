@@ -32,14 +32,14 @@ export const metadata = {
   ],
   authors: [
     {
-      name: "mickasmt",
+      name: "luanaraujo",
     },
   ],
-  creator: "mickasmt",
+  creator: "luanaraujo",
   metadataBase: new URL(siteConfig.url),
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "pt_br",
     url: siteConfig.url,
     title: siteConfig.name,
     description: siteConfig.description,
@@ -50,7 +50,7 @@ export const metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     images: [siteConfig.ogImage],
-    creator: "@miickasmt",
+    creator: "@luanaraujo",
   },
   icons: {
     icon: "/favicon.ico",
