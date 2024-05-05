@@ -1,6 +1,6 @@
 import NextAuth, { Session } from "next-auth"
 import { NextRequest } from 'next/server';
-
+export { auth as middleware } from "@/auth"
 import authConfig from "./auth.config"
 import {
   DEFAULT_LOGIN_REDIRECT,
