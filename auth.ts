@@ -1,8 +1,10 @@
-import NextAuth from "next-auth"
+
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "@/lib/db"
 import authConfig from "@/auth.config"
 import { getUserById } from "@/lib/user"
+import { Role } from "@prisma/client"
+import { prisma } from "./lib/db"
+import NextAuth from "next-auth"
 
 export const { 
   handlers: { GET, POST },
@@ -29,6 +31,10 @@ export const {
         session.user.image = token.picture;
       }
 
+      if (token.role && session.user) {
+        session.user.role = token.role as Role;
+      }
+
       return session
     },
 
@@ -42,6 +48,7 @@ export const {
       token.name = dbUser.name;
       token.email = dbUser.email;
       token.picture = dbUser.image;
+      token.role = dbUser.role;
 
       return token;
     },

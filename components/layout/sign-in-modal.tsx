@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { useSigninModal } from "@/hooks/use-signin-modal";
 import { signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export const SignInModal = () => {
   const signInModal = useSigninModal();
@@ -33,9 +34,9 @@ export const SignInModal = () => {
             disabled={signInClicked}
             onClick={() => {
               setSignInClicked(true);
-              signIn("google", { redirect: false }).then(() =>
-                // TODO: fix this without setTimeOut(), modal closes too quickly. Idea: update value before redirect
-                setTimeout(() => {
+              signIn("google", { redirect: true, callbackUrl: "/start"}).then(() =>
+              // TODO: fix this without setTimeOut(), modal closes too quickly. Idea: update value before redirect
+              setTimeout(() => {
                   signInModal.onClose();
                 }, 1000)
               );

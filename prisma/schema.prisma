@@ -44,17 +44,28 @@ model Session {
   @@map(name: "sessions")
 }
 
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+  OWNER
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  role          Role      @default(USER)
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @default(now()) @map(name: "updated_at")
 
   accounts Account[]
   sessions Session[]
+  
+  companyId String?
+  company Company? @relation(fields: [companyId], references: [id])
 
   stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
   stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
@@ -62,6 +73,7 @@ model User {
   stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
 
   @@map(name: "users")
+  @@index([companyId])
 }
 
 model VerificationToken {
@@ -72,3 +84,16 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map(name: "verification_tokens")
 }
+
+model Company {
+  id String @id @default(cuid())
+  name String
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+
+  users User[]
+
+
+  @@map(name: "companies")
+}
+
