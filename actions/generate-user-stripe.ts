@@ -23,7 +23,7 @@ export async function generateUserStripe(priceId: string): Promise<responseActio
     if (!session?.user || !session?.user.email) {
       throw new Error("Unauthorized");
     }
-
+//@ts-ignore
     const subscriptionPlan = await getUserSubscriptionPlan(session.user.id)
 
     if (subscriptionPlan.isPaid && subscriptionPlan.stripeCustomerId) {
@@ -36,6 +36,7 @@ export async function generateUserStripe(priceId: string): Promise<responseActio
       redirectUrl = stripeSession.url as string
     } else {
       // User on Free Plan - Create a checkout session to upgrade.
+      //@ts-ignore
       const stripeSession = await stripe.checkout.sessions.create({
         success_url: billingUrl,
         cancel_url: billingUrl,

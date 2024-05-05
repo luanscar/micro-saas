@@ -14,6 +14,7 @@ export default async function PricingPage() {
   let subscriptionPlan;
 
   if (user) {
+    //@ts-ignore
     subscriptionPlan = await getUserSubscriptionPlan(user.id)
   }
 

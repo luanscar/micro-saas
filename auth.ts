@@ -44,6 +44,7 @@ export const {
       if (user) {
         // User is available during sign-in
         //TODO: Verificar a extensão
+        //@ts-ignore
         token.id = user.id;
         token.role = "DEFAULT";
       }

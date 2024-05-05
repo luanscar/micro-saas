@@ -14,7 +14,7 @@ export default async function StartPage() {
   }
 
   return (
-    <div className="container mx-auto h-screen w-screen flex items-center justify-center">
+    <div className="h-screen w-screen flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Company Details</CardTitle>

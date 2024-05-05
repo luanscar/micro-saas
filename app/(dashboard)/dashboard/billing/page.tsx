@@ -19,7 +19,7 @@ export default async function BillingPage() {
   if (!user) {
     redirect("/login");
   }
-
+//@ts-ignore
   const userSubscriptionPlan = await getUserSubscriptionPlan(user.id);
 
   return (
