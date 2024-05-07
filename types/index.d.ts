@@ -88,3 +88,32 @@ export type InfoLdg = {
   description: string;
   list: InfoList[];
 }
+
+type UserWithCompanyWithPermissions = {
+  id: string;
+  name: string
+  email: string | null;
+  emailVerified: Date | null;
+  image: string | null;
+  role: Role;
+  createdAt: Date;
+  updatedAt: Date;
+  companyId: string | null;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+  stripePriceId: string | null;
+  stripeCurrentPeriodEnd: Date | null;
+  company: {
+    id: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+    sidebarOptions: CompanySidebarOption[];
+  } | null;
+  permissions: {
+    id: string;
+    email: string;
+    companyId: string;
+    access: boolean;
+  }[];
+};

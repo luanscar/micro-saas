@@ -1,30 +1,45 @@
-import React from "react";
+import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getCompanyByUserId } from "@/actions/company";
 
 import { getCurrentUser } from "@/lib/session";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import CompanyDetails from "@/components/forms/company-details";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-
 
 export default async function StartPage() {
   const loggedUser = await getCurrentUser();
-  if (!loggedUser) {
-    redirect("/");
+
+  if (!loggedUser?.id) {
+    redirect("/login");
+  }
+
+  const companyDetails = await getCompanyByUserId(loggedUser.id);
+  console.log(companyDetails?.name)
+
+  if (companyDetails?.id) {
+    return redirect(`/${companyDetails.id}`);
   }
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Company Details</CardTitle>
-          <CardDescription>Please enter your company details</CardDescription>
-        </CardHeader>
-        <Separator />
-        <CardContent>
-          <CompanyDetails />
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <Dialog open>
+        <DialogContent className="overflow-hidden p-0">
+          <DialogHeader className="p-8">
+            <DialogTitle>Company Details</DialogTitle>
+            <DialogDescription>
+              Please enter your company details
+            </DialogDescription>
+          </DialogHeader>
+          <CompanyDetails data={companyDetails} />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider     = "postgresql"
-  url          = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -59,21 +59,22 @@ model User {
   image         String?
   role          Role      @default(USER)
   createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @default(now()) @map(name: "updated_at")
+  updatedAt     DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-  
+  accounts    Account[]
+  sessions    Session[]
+  permissions Permissions[]
+
   companyId String?
-  company Company? @relation(fields: [companyId], references: [id])
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
   stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
   stripePriceId          String?   @map(name: "stripe_price_id")
   stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
 
-  @@map(name: "users")
   @@index([companyId])
+  @@map(name: "users")
 }
 
 model VerificationToken {
@@ -86,14 +87,73 @@ model VerificationToken {
 }
 
 model Company {
-  id String @id @default(cuid())
-  name String
-  createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @default(now()) @map(name: "updated_at")
-
-  users User[]
-
+  id             String                 @id @default(cuid())
+  name           String
+  createdAt      DateTime               @default(now()) @map(name: "created_at")
+  updatedAt      DateTime               @updatedAt
+  users          User[]
+  permissions    Permissions[]
+  sidebarOptions CompanySidebarOption[]
 
   @@map(name: "companies")
 }
 
+model CompanySidebarOption {
+  id        String   @id @default(uuid())
+  name      String   @default("Menu")
+  link      String   @default("#")
+  icon      Icon     @default(info)
+  companyId String
+  Company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@map(name: "company_sidebar_options")
+}
+
+model Permissions {
+  id        String  @id @default(uuid())
+  email     String
+  User      User    @relation(fields: [email], references: [email], onDelete: Cascade)
+  companyId String
+  Company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  access    Boolean
+
+  @@index([companyId])
+  @@index([email])
+  @@map(name: "permissions")
+}
+
+enum Icon {
+  settings
+  chart
+  calendar
+  check
+  chip
+  compass
+  database
+  flag
+  home
+  info
+  link
+  lock
+  messages
+  notification
+  payment
+  power
+  receipt
+  shield
+  star
+  tune
+  videorecorder
+  wallet
+  warning
+  headphone
+  send
+  pipelines
+  person
+  category
+  contact
+  clipboardIcon
+}
