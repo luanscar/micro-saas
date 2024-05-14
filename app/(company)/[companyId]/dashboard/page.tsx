@@ -10,9 +10,7 @@ export default function DashboardPage() {
         <Page.Title>Dashboard</Page.Title>
       </Page.Header>
       <Page.Main>
-        <Page.MainContainer>
-          <Analytics />
-        </Page.MainContainer>
+        <Page.MainContainer>Dash</Page.MainContainer>
       </Page.Main>
     </Page.Root>
   );

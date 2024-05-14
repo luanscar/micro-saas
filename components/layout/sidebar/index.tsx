@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
@@ -130,7 +129,7 @@ function SidebarFooter({ className, children }: SidebarGenericProps) {
   );
 }
 
-export const Sidebar = {
+export const SidebarOld = {
   Root: SidebarRoot,
   Main: SidebarMain,
   Nav: SidebarNav,

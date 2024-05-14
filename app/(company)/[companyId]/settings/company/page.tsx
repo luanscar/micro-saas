@@ -1,17 +1,9 @@
-import React from "react";
 import { notFound } from "next/navigation";
 import { getUserWithCompanyWithPermissions } from "@/actions/user";
 
 import { getCurrentUser } from "@/lib/session";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import CompanyDetails from "@/components/forms/company-details";
+import CompanyForm from "@/components/forms/company-form";
 import { Page } from "@/components/layout/page";
 
 export default async function CompanyPage() {
@@ -25,8 +17,10 @@ export default async function CompanyPage() {
   return (
     <Page.Root>
       <Page.Main>
-        <Page.MainContainer className="flex flex-1 flex-col items-center justify-center">
-          <CompanyDetails data={company} />
+        <Page.MainContainer>
+          <div>
+            <CompanyForm data={company} />
+          </div>
         </Page.MainContainer>
       </Page.Main>
     </Page.Root>

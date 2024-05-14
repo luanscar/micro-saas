@@ -2,14 +2,14 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { UserWithCompanyWithPermissions } from "@/types";
+import { UsersWithCompanyWithPermissions } from "@/types";
 import { User } from "lucide-react";
 
 import { icons } from "@/lib/constants";
 import { Sidebar } from "@/components/layout/sidebar";
 
 type NavigationSidebarProps = {
-  data: UserWithCompanyWithPermissions;
+  data: UsersWithCompanyWithPermissions;
 };
 
 export default function NavigationSidebar({ data }: NavigationSidebarProps) {

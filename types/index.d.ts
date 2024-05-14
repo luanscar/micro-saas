@@ -1,12 +1,18 @@
-import { User } from "@prisma/client";
+import { getUserWithCompanyWithPermissions } from "@/actions/user";
+import { Prisma, User } from "@prisma/client";
 import type { Icon } from "lucide-react";
 
+import { prisma } from "@/lib/db";
 import { Icons } from "@/components/shared/icons";
 
 export type NavItem = {
   title: string;
   href: string;
   disabled?: boolean;
+};
+export type MobileNavItem = {
+  title: string;
+  href: string;
 };
 
 export type MainNavItem = NavItem;
@@ -87,11 +93,15 @@ export type InfoLdg = {
   image: string;
   description: string;
   list: InfoList[];
-}
+};
+
+export type UserDetails = Prisma.PromiseReturnType<
+  typeof getUserWithCompanyWithPermissions
+>;
 
 type UserWithCompanyWithPermissions = {
   id: string;
-  name: string
+  name: string | null;
   email: string | null;
   emailVerified: Date | null;
   image: string | null;

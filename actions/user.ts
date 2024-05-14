@@ -1,6 +1,6 @@
 "use server";
 
-import { UserWithCompanyWithPermissions } from "@/types";
+import { UsersWithCompanyWithPermissions } from "@/types";
 import { User } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
@@ -19,7 +19,7 @@ export const initUser = async (newUser: Partial<User>) => {
       image: loggedUser.image,
       email: loggedUser.email,
       name: `${loggedUser.name}`,
-      role: newUser.role || "USER",
+      role: newUser.role || "MODERATOR",
     },
   });
 
@@ -35,11 +35,57 @@ export const getUserWithCompanyWithPermissions = async (userId: string) => {
       company: {
         include: {
           sidebarOptions: true,
+          users: {
+            include: {
+              permissions: true,
+            },
+          },
         },
       },
       permissions: true,
     },
   });
 
-  return response as UserWithCompanyWithPermissions;
+  return response;
+};
+
+export const upsertUser = async (user: Partial<User>) => {
+  const response = await prisma.user.upsert({
+    where: {
+      id: user.id,
+    },
+    update: { ...user },
+    create: { ...user },
+  });
+
+  return response;
+};
+
+export const getAuthUserDetails = async () => {
+  const user = await getCurrentUser();
+  if (!user) {
+    return;
+  }
+
+  const userData = await prisma.user.findUnique({
+    where: {
+      id: user.id,
+    },
+    include: {
+      company: true,
+      permissions: true,
+    },
+  });
+
+  return userData;
+};
+
+export const getUser = async (id: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  return user;
 };

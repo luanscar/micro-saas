@@ -1,13 +1,15 @@
 import "@/styles/globals.css";
 
 import { fontHeading, fontSans, fontUrban } from "@/assets/fonts";
-import ModalProvider from "@/providers/modal-provider";
+import { Providers } from "@/providers";
+import { ModalProvider } from "@/providers/modal-provider";
 import { ThemeProvider } from "next-themes";
 
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import { Analytics } from "@/components/analytics";
+import Layout from "@/components/layout/container";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 
 interface RootLayoutProps {
@@ -67,23 +69,15 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          "h-screen bg-background font-sans antialiased",
+          "font-sans antialiased",
           fontSans.variable,
           fontUrban.variable,
           fontHeading.variable,
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ModalProvider>{children}</ModalProvider>
-          <Analytics />
-          <Toaster />
-          <TailwindIndicator />
-        </ThemeProvider>
+        <Providers>
+          <Layout>{children}</Layout>
+        </Providers>
       </body>
     </html>
   );

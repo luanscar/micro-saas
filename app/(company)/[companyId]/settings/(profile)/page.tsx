@@ -1,15 +1,23 @@
-import React from "react";
+import { notFound } from "next/navigation";
+import { getUserWithCompanyWithPermissions } from "@/actions/user";
 
+import { getCurrentUser } from "@/lib/session";
+import CompanyDetails from "@/components/forms/company-details";
+import ProfileForm from "@/components/forms/profile-form";
 import { Page } from "@/components/layout/page";
-import Grid from "@/components/shared/grid";
 
-import SettingsSidebar from "../_components/settings-sidebar";
+export default async function ProfilePage() {
+  const loggedUser = await getCurrentUser();
+  if (!loggedUser || !loggedUser.id) return notFound();
 
-export default function ProfilePage() {
+  const userDetails = await getUserWithCompanyWithPermissions(loggedUser.id);
+
   return (
     <Page.Root>
       <Page.Main>
-        <Page.MainContainer>UserForm</Page.MainContainer>
+        <Page.MainContainer>
+          <ProfileForm userData={userDetails} />
+        </Page.MainContainer>
       </Page.Main>
     </Page.Root>
   );

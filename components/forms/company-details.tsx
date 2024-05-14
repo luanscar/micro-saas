@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { upsertCompany } from "@/actions/company";
 import { initUser } from "@/actions/user";
@@ -15,7 +16,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
@@ -28,10 +28,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Separator } from "../ui/separator";
-import { toast, useToast } from "../ui/use-toast";
+import { useToast } from "../ui/use-toast";
 
 type CompanyDetails = {
   data: Company | null;
@@ -50,11 +48,7 @@ export default function CompanyDetails({ data }: CompanyDetails) {
 
   const onSubmit = async (values: z.infer<typeof companySchema>) => {
     try {
-      let newUserData;
-
       if (!data?.id || data?.id) {
-        newUserData = await initUser({ role: "OWNER" });
-
         const response = await upsertCompany({
           id: data?.id ? data.id : v4(),
           name: values.companyName.trim(),
@@ -86,50 +80,47 @@ export default function CompanyDetails({ data }: CompanyDetails) {
 
   const isSubmitting = form.formState.isSubmitting;
   const onFieldChange = form.getValues("companyName") !== data?.name;
+
   return (
-    <div className="">
-      <Card>
-        <CardHeader>
-          <CardTitle>Company name</CardTitle>
-          <CardDescription>
-            <CardDescription>
-              This is the company details page, where you can view and edit your
-              company information.
-            </CardDescription>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField
-                name="companyName"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter company name"
-                        {...field}
-                        disabled={isSubmitting}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="border-t px-6 py-4">
-          <Button
-            onClick={() => form.handleSubmit(onSubmit)()}
-            variant="default"
-            disabled={!onFieldChange}
-          >
-            Save
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Company name</CardTitle>
+        <CardDescription>
+          This is the company details page, where you can view and edit your
+          company information.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              name="companyName"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter company name"
+                      {...field}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+      </CardContent>
+      <CardFooter className="border-t px-6 py-4">
+        <Button
+          onClick={() => form.handleSubmit(onSubmit)()}
+          variant="default"
+          disabled={!onFieldChange}
+        >
+          Save
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

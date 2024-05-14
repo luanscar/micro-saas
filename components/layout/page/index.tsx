@@ -43,7 +43,9 @@ export function PageMain({ className, children }: PageGenericProps) {
 }
 export function PageMainContainer({ className, children }: PageGenericProps) {
   return (
-    <main className={cn(["container mx-auto grow  p-14", className])}>
+    <main
+      className={cn(["container mx-auto max-w-screen-lg grow p-14", className])}
+    >
       {children}
     </main>
   );

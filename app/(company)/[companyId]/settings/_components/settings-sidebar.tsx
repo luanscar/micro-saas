@@ -25,19 +25,19 @@ export default function SettingsSidebar({ companyId }: SettingsSidebarProps) {
               active={isActive(`/${companyId}/settings`)}
               href={`/${companyId}/settings`}
             >
-              Your profile
+              <span>Your profile</span>
             </Sidebar.NavLink>
             <Sidebar.NavLink
               active={isActive(`/${companyId}/settings/company`)}
               href={`/${companyId}/settings/company`}
             >
-              Company
+              <span>Company</span>
             </Sidebar.NavLink>
             <Sidebar.NavLink
-              active={isActive(`/${companyId}/settings/company/theme`)}
-              href={`/${companyId}/settings/theme`}
+              active={isActive(`/${companyId}/settings/team`)}
+              href={`/${companyId}/settings/team`}
             >
-              Theme
+              <span>Team</span>
             </Sidebar.NavLink>
           </Sidebar.NavItem>
         </Sidebar.Nav>

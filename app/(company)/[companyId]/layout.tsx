@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { getUserWithCompanyWithPermissions } from "@/actions/user";
 
 import { getCurrentUser } from "@/lib/session";
-
-import NavigationSidebar from "./_components/navigation-sidebar";
+import { Grid } from "@/components/layout/grid";
+import Sidebar from "@/components/shared/sidebar";
 
 type CompanyIdProps = {
   children: React.ReactNode;
@@ -16,16 +16,16 @@ const CompanyIdLayout = async ({ children, params }: CompanyIdProps) => {
 
   if (!loggedUser || !loggedUser.id) return notFound();
 
-  const userDetails = await getUserWithCompanyWithPermissions(loggedUser.id);
+  const details = await getUserWithCompanyWithPermissions(loggedUser.id);
+
+  if (!details) return null;
 
   return (
-    <div className="grid h-screen w-screen grid-cols-[18rem_1fr]">
-      {/* <pre>{JSON.stringify(userDetails, null, 2)}</pre> */}
-
-      <NavigationSidebar data={userDetails} />
-
-      <main className="">{children}</main>
-    </div>
+    <Grid cols={"[18rem_1fr]"}>
+      <div className="h-full bg-zinc-600">sidebar</div>
+      {/* <Sidebar details={details} /> */}
+      <div>ss</div>
+    </Grid>
   );
 };
 
