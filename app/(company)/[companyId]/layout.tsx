@@ -21,9 +21,8 @@ const CompanyIdLayout = async ({ children, params }: CompanyIdProps) => {
   if (!details) return null;
 
   return (
-    <Grid cols={"[18rem_1fr]"}>
-      <div className="h-full bg-zinc-600">sidebar</div>
-      {/* <Sidebar details={details} /> */}
+    <Grid cols="[18rem_1fr]">
+      <Sidebar details={details} />
       <div>ss</div>
     </Grid>
   );
