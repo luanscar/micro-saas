@@ -1,6 +1,9 @@
+import { cn } from "@/lib/utils";
+
 type GridProps = {
   children: React.ReactNode;
-  cols?: number | string;
+  className?: string;
+  cols?: number;
   sm?: number;
   md?: number;
   lg?: number;
@@ -11,16 +14,17 @@ type GridProps = {
 
 export const Grid = ({
   children,
-  cols = 1,
+  cols,
   sm,
   md,
   lg,
   xl,
   xxl,
-  gap = 8,
+  gap = 0,
+  className,
 }: GridProps) => {
   const small = sm ? `sm:grid-cols-${sm}` : "";
-  const medium = md ? `md:grid-cols-${md}` : "";
+  const medium = md ? `md:grid-cols-[${md}rem_1fr]` : "";
   const large = lg ? `lg:grid-cols-${lg}` : "";
   const extraLarge = xl ? `xl:grid-cols-${xl}` : "";
   const extraExtraLarge = xxl ? `2xl:grid-cols-${xxl}` : "";
@@ -30,7 +34,12 @@ export const Grid = ({
 
   return (
     <>
-      <div className={`grid max-h-full  grid-cols-${cols} ${responsive}`}>
+      <div
+        className={cn(
+          [`grid w-full grid-cols-${cols} ${responsive}`],
+          className,
+        )}
+      >
         {children}
       </div>
     </>

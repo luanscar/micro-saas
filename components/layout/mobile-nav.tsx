@@ -1,8 +1,6 @@
 "use client";
 
-import * as React from "react";
 import { useUserStore } from "@/providers/user-store-provider";
-import { Home, Settings2 } from "lucide-react";
 
 import { icons } from "@/lib/constants";
 
@@ -13,8 +11,8 @@ export function MobileNav() {
   const company = useUserStore().getState().data?.company;
 
   return (
-    <Navbar.Root className="fixed bottom-0 w-full border-t p-2">
-      <Navbar.Nav className="flex ">
+    <Navbar.Root className="fixed bottom-0 z-10 w-full border-t bg-background p-2">
+      <Navbar.Nav className="flex w-full  justify-between">
         {company?.sidebarOptions.map((s) => {
           let val;
           const result = icons.find((i) => i.value === s.icon);

@@ -98,7 +98,7 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
 
   const isModerator = userData?.role === Role.MODERATOR;
   return (
-    <Card className="mx-auto my-12 w-full max-w-xl rounded-lg bg-primary-foreground">
+    <Card className="w-full rounded-lg bg-primary-foreground">
       <CardHeader>
         <CardTitle className="mb-2 text-2xl font-bold">Perfil</CardTitle>
         <CardDescription className="mb-6">

@@ -1,24 +1,29 @@
-import { Session, User } from "@prisma/client"
-import { AvatarProps } from "@radix-ui/react-avatar"
+"use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Icons } from "@/components/shared/icons"
+import { useUserStore } from "@/providers/user-store-provider";
+import { AvatarProps } from "@radix-ui/react-avatar";
 
-interface UserAvatarProps extends AvatarProps {
-  user: Partial<User>
-}
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Icons } from "@/components/shared/icons";
 
-export function UserAvatar({ user, ...props }: UserAvatarProps) {
+interface UserAvatarProps extends AvatarProps {}
+
+export function UserAvatar({ ...props }: UserAvatarProps) {
+  const user = useUserStore().getState().data;
   return (
     <Avatar {...props}>
-      {user.image ? (
-        <AvatarImage alt="Picture" src={user.image} referrerPolicy="no-referrer" />
+      {user?.image ? (
+        <AvatarImage
+          alt="Picture"
+          src={user.image}
+          referrerPolicy="no-referrer"
+        />
       ) : (
         <AvatarFallback>
-          <span className="sr-only">{user.name}</span>
+          <span className="sr-only">{user?.name}</span>
           <Icons.user className="size-4" />
         </AvatarFallback>
       )}
     </Avatar>
-  )
+  );
 }

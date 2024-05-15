@@ -1,6 +1,9 @@
 import { ReactNode } from "react";
 
+import { Grid } from "@/components/layout/grid";
 import { Page } from "@/components/layout/page";
+
+import SettingsSidebar from "./_components/settings-sidebar";
 
 type SettingsLayoutProps = {
   children: ReactNode;
@@ -12,16 +15,17 @@ export default function SettingsLayout({
   params,
 }: SettingsLayoutProps) {
   return (
-    <Page.Root>
-      <Page.Header>
+    <Page.Root className="">
+      <Page.Header className="border-b border-border p-4">
         <Page.Title>Settings</Page.Title>
       </Page.Header>
-      <Page.Main>
-        <div className="grid w-full grid-cols-[14rem_1fr] ">
-          {/* <SettingsSidebar companyId={params.companyId} /> */}
-          <div>{children}</div>
+      <Grid className="md:grid-cols-[14rem_1fr]" cols={1}>
+        <div className="hidden border-r border-border md:grid">
+          settings sidebar
         </div>
-      </Page.Main>
+        {/* <SettingsSidebar companyId={params.companyId} /> */}
+        {children}
+      </Grid>
     </Page.Root>
   );
 }

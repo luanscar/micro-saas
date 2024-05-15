@@ -11,14 +11,10 @@ type NavbarGenericProps<T = unknown> = {
 } & T;
 
 function NavbarRoot({ children, className }: NavbarGenericProps) {
-  return (
-    <div className={cn(["delay-900 animate-fade-up", className])}>
-      {children}
-    </div>
-  );
+  return <div className={cn(["", className])}>{children}</div>;
 }
 function Nav({ className, children }: NavbarGenericProps) {
-  return <nav className={cn(["h-full", className])}>{children}</nav>;
+  return <nav className={cn(["", className])}>{children}</nav>;
 }
 
 function NavbarHeader({ className, children }: NavbarGenericProps) {
@@ -75,18 +71,17 @@ function NavbarLink({
   onClick,
 }: NavbarGenericProps<NavbarLinkProps>) {
   return (
-    <button className="w-full">
-      <Link
-        onClick={onClick}
-        href={href}
-        className={cn([
-          "flex  items-center justify-center rounded-full font-medium text-muted-foreground transition-all  hover:text-primary  md:h-full md:w-full md:justify-normal md:gap-4 md:rounded-md md:px-3 md:py-2",
-          className,
-        ])}
-      >
-        {children}
-      </Link>
-    </button>
+    <Link
+      onClick={onClick}
+      href={href}
+      className={cn([
+        "text-muted-foreground transition-all ",
+        className,
+        active && "bg-primary-foreground",
+      ])}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -103,11 +98,10 @@ function NavbarIcon({ className, icon: Icon }: NavbarIconProps) {
 }
 
 function NavbarItem({ className, children }: NavbarGenericProps) {
-  return (
-    <div className={cn(["flex w-full items-center justify-center", className])}>
-      {children}
-    </div>
-  );
+  return <div className={cn(["w-full", className])}>{children}</div>;
+}
+function NavbarFooter({ className, children }: NavbarGenericProps) {
+  return <footer className={cn(["w-full", className])}>{children}</footer>;
 }
 
 export const Navbar = {
@@ -122,4 +116,5 @@ export const Navbar = {
   Icon: NavbarIcon,
   Link: NavbarLink,
   Label: NavbarLabel,
+  Footer: NavbarFooter,
 };

@@ -1,32 +1,30 @@
-"use client"
+"use client";
 
-import { signOut } from "next-auth/react"
-import Link from "next/link"
+import Link from "next/link";
+import { useUserStore } from "@/providers/user-store-provider";
+import { Company, User } from "@prisma/client";
+import { CreditCard, LayoutDashboard, LogOut, Settings } from "lucide-react";
+import { signOut } from "next-auth/react";
 
-import { UserAvatar } from "@/components/shared/user-avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import { CreditCard, LayoutDashboard, LogOut, Settings } from "lucide-react"
-import type { User } from "next-auth"
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { UserAvatar } from "@/components/shared/user-avatar";
 
-interface UserAccountNavProps extends React.HTMLAttributes<HTMLDivElement> {
-  user: Pick<User, "name" | "image" | "email">
-}
+export function UserAccountNav() {
+  const details = useUserStore().getState().data;
 
-export function UserAccountNav({ user }: UserAccountNavProps) {
+  const company = details?.company;
+  const { ...user }: User | null = details;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <UserAvatar
-          user={{ name: user?.name || null, image: user?.image || null }}
-          className="size-8"
-        />
+        <UserAvatar className="size-8" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <div className="flex items-center justify-start gap-2 p-2">
@@ -41,19 +39,28 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/dashboard" className="flex items-center space-x-2.5">
+          <Link
+            href={`/${company?.id}/dashboard`}
+            className="flex items-center space-x-2.5"
+          >
             <LayoutDashboard className="size-4" />
             <p className="text-sm">Dashboard</p>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/billing" className="flex items-center space-x-2.5">
+          <Link
+            href={`/${company?.id}/settings/billing`}
+            className="flex items-center space-x-2.5"
+          >
             <CreditCard className="size-4" />
             <p className="text-sm">Billing</p>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/settings" className="flex items-center space-x-2.5">
+          <Link
+            href={`/${company?.id}/settings`}
+            className="flex items-center space-x-2.5"
+          >
             <Settings className="size-4" />
             <p className="text-sm">Settings</p>
           </Link>
@@ -62,10 +69,10 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         <DropdownMenuItem
           className="cursor-pointer"
           onSelect={(event) => {
-            event.preventDefault()
+            event.preventDefault();
             signOut({
               callbackUrl: `${window.location.origin}/`,
-            })
+            });
           }}
         >
           <div className="flex items-center space-x-2.5">
@@ -75,5 +82,5 @@ export function UserAccountNav({ user }: UserAccountNavProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

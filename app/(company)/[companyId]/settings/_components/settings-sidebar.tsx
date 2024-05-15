@@ -3,8 +3,6 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 
-import { Sidebar } from "@/components/layout/sidebar";
-
 type SettingsSidebarProps = {
   companyId: string;
 };
@@ -17,31 +15,31 @@ export default function SettingsSidebar({ companyId }: SettingsSidebarProps) {
   };
 
   return (
-    <Sidebar.Root>
-      <Sidebar.Main className="mt-10">
-        <Sidebar.Nav>
-          <Sidebar.NavItem>
-            <Sidebar.NavLink
+    <SidebarOld.Root>
+      <SidebarOld.Main className="mt-10">
+        <SidebarOld.Nav>
+          <SidebarOld.NavItem>
+            <SidebarOld.NavLink
               active={isActive(`/${companyId}/settings`)}
               href={`/${companyId}/settings`}
             >
               <span>Your profile</span>
-            </Sidebar.NavLink>
-            <Sidebar.NavLink
+            </SidebarOld.NavLink>
+            <SidebarOld.NavLink
               active={isActive(`/${companyId}/settings/company`)}
               href={`/${companyId}/settings/company`}
             >
               <span>Company</span>
-            </Sidebar.NavLink>
-            <Sidebar.NavLink
+            </SidebarOld.NavLink>
+            <SidebarOld.NavLink
               active={isActive(`/${companyId}/settings/team`)}
               href={`/${companyId}/settings/team`}
             >
               <span>Team</span>
-            </Sidebar.NavLink>
-          </Sidebar.NavItem>
-        </Sidebar.Nav>
-      </Sidebar.Main>
-    </Sidebar.Root>
+            </SidebarOld.NavLink>
+          </SidebarOld.NavItem>
+        </SidebarOld.Nav>
+      </SidebarOld.Main>
+    </SidebarOld.Root>
   );
 }

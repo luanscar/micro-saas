@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { getUserWithCompanyWithPermissions } from "@/actions/user";
 
 import { getCurrentUser } from "@/lib/session";
-import CompanyDetails from "@/components/forms/company-details";
 import ProfileForm from "@/components/forms/profile-form";
 import { Page } from "@/components/layout/page";
 
@@ -14,11 +13,12 @@ export default async function ProfilePage() {
 
   return (
     <Page.Root>
-      <Page.Main>
-        <Page.MainContainer>
-          <ProfileForm userData={userDetails} />
-        </Page.MainContainer>
-      </Page.Main>
+      <Page.Container>
+        <ProfileForm userData={userDetails} />
+        <ProfileForm userData={userDetails} />
+        <ProfileForm userData={userDetails} />
+        <ProfileForm userData={userDetails} />
+      </Page.Container>
     </Page.Root>
   );
 }

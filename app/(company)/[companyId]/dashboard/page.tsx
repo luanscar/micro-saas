@@ -1,6 +1,3 @@
-import React from "react";
-
-import { Analytics } from "@/components/analytics";
 import { Page } from "@/components/layout/page";
 
 export default function DashboardPage() {
@@ -9,9 +6,12 @@ export default function DashboardPage() {
       <Page.Header>
         <Page.Title>Dashboard</Page.Title>
       </Page.Header>
-      <Page.Main>
-        <Page.MainContainer>Dash</Page.MainContainer>
-      </Page.Main>
+      <Page.Content>
+        <div className="h-full ">
+          {/* <ProfileForm userData={userDetails} /> */}
+          content
+        </div>
+      </Page.Content>
     </Page.Root>
   );
 }

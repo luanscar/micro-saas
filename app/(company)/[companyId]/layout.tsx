@@ -21,9 +21,9 @@ const CompanyIdLayout = async ({ children, params }: CompanyIdProps) => {
   if (!details) return null;
 
   return (
-    <Grid cols="[18rem_1fr]">
+    <Grid cols={1} className="md:grid-cols-[18rem_1fr]">
       <Sidebar details={details} />
-      <div>ss</div>
+      {children}
     </Grid>
   );
 };
