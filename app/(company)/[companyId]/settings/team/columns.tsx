@@ -1,7 +1,7 @@
 "use client";
 
-import { UsersWithCompanyWithPermissions } from "@/types";
-import { Company, Permissions } from "@prisma/client";
+import { TeamMembersByCompany } from "@/types";
+import { Permissions, Role, Team, User } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, Edit, MoreHorizontal } from "lucide-react";
 
@@ -18,15 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export type Members = {
-  name?: string | undefined;
-  email?: string;
-  role: string;
-  company: Company | null;
-  permissions: Permissions[];
-};
-
-export const columns: ColumnDef<UsersWithCompanyWithPermissions>[] = [
+export const columns: ColumnDef<TeamMembersByCompany>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -80,12 +72,10 @@ export const columns: ColumnDef<UsersWithCompanyWithPermissions>[] = [
   },
   {
     accessorKey: "permissions",
-    header: "Permissions",
+    header: "Access",
     cell: ({ row }) => {
-      const company = row.original.company;
-      const ownedAccounts = row.original.permissions.filter(
-        (per) => per.access,
-      );
+      const metadata = row.original;
+      const ownedAccounts = metadata?.permissions.filter((per) => per.access);
       return (
         <div className="flex flex-col items-start">
           <div className="flex flex-col gap-2">
@@ -95,7 +85,7 @@ export const columns: ColumnDef<UsersWithCompanyWithPermissions>[] = [
                   key={i.id}
                   className="w-fit whitespace-nowrap bg-slate-600"
                 >
-                  Access on - {company?.name}
+                  Access on - {metadata?.name}
                 </Badge>
               ))
             ) : (
@@ -110,7 +100,7 @@ export const columns: ColumnDef<UsersWithCompanyWithPermissions>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const member = row.original;
+      const userData = row.original as Partial<User>;
       const { onOpen } = useModal();
       return (
         <DropdownMenu>
@@ -124,13 +114,15 @@ export const columns: ColumnDef<UsersWithCompanyWithPermissions>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               className="flex gap-2"
-              onClick={() => onOpen("upsertUser", { user: member })}
+              onClick={() => onOpen("upsertUser", { user: userData })}
             >
               <Edit size={15} /> Edit User
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(member.email)}
+              onClick={() =>
+                navigator.clipboard.writeText(userData.email as string)
+              }
             >
               Copy User E-mail
             </DropdownMenuItem>

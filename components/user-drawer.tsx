@@ -1,34 +1,32 @@
 "use client";
 
 import React from "react";
-import { redirect } from "next/navigation";
 import { useUserStore } from "@/providers/user-store-provider";
-import { UserDetails } from "@/types";
-import { User } from "@prisma/client";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight, PlusCircle } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
+  Drawer, DrawerContent,
+  DrawerDescription, DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
+  DrawerTrigger
 } from "@/components/ui/drawer";
 
 import { Navbar } from "./layout/navbar";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { mobileLinks } from "@/lib/constants";
+import { ModeToggle } from "./layout/mode-toggle";
+import { Separator } from "./ui/separator";
+import { useModal } from "@/hooks/use-modal-store";
 
 export function UserDrawer() {
   const [open, setOpen] = React.useState(false);
   console.log(open);
   const data = useUserStore().getState().data;
   if (!data) return;
-  const { sidebarOptions } = data?.company || {};
+
+  const { type, onOpen, isOpen, onClose } = useModal()
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -41,34 +39,49 @@ export function UserDrawer() {
             />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
+
         </div>
       </DrawerTrigger>
       <DrawerContent>
-        <div className="mx-auto w-full max-w-sm ">
-          <DrawerHeader className="flex flex-col items-start">
-            <DrawerTitle>{data.name}</DrawerTitle>
-            <DrawerDescription>{data.email}</DrawerDescription>
+        <div className="mx-auto w-full max-w-sm">
+          <DrawerHeader className="flex flex-row items-start justify-between ">
+            <div className="flex flex-col items-start">
+              <DrawerTitle>{data.name}</DrawerTitle>
+              <DrawerDescription>{data.email}</DrawerDescription>
+            </div>
+            <ModeToggle />
+
           </DrawerHeader>
           <Navbar.Root className="h-full w-full">
             <Navbar.Nav className="flex w-full flex-col">
-              {sidebarOptions?.map((s) => {
+              {mobileLinks?.map((item) => {
                 return (
-                  <Navbar.Item key={s.id} className="w-full ">
+                  <Navbar.Item key={item.id} className="w-full ">
                     <Navbar.Link
                       onClick={() => setOpen(false)}
                       className="group flex w-full  justify-between rounded-md p-2 px-4 underline-offset-4  hover:underline"
-                      href={`${s.link}/`}
+                      href={`/${data.companyId}/${item.href}`}
                     >
-                      <Navbar.Label>{s.name}</Navbar.Label>
+                      <Navbar.Label>{item.name}</Navbar.Label>
                       <Navbar.Icon
                         className="h-8 w-8 rounded-full p-2 group-hover:bg-primary-foreground/20"
-                        icon={ArrowRight}
+                        icon={ChevronRight}
                       />
                     </Navbar.Link>
                   </Navbar.Item>
                 );
               })}
-              <Navbar.Item className="w-full ">
+              <Navbar.Item className="space-y-4 ">
+                <Separator />
+                <Button onClick={() => onOpen("createUser")} variant="ghost" className="group flex w-full  justify-between rounded-md p-2 px-4 underline-offset-4  hover:underline">
+                  <div className="flex flex-row items-center  gap-2"><PlusCircle />
+                    <Navbar.Label>Convidar membro</Navbar.Label></div>
+                  <Navbar.Icon icon={ChevronRight} className="h-8 w-8 rounded-full p-2 group-hover:bg-primary-foreground/20" />
+                </Button>
+                <Separator />
+
+              </Navbar.Item>
+              <Navbar.Item className="w-full  mb-4">
                 <Button
                   variant="link"
                   className="group flex w-full  justify-between rounded-md p-2 px-4 underline-offset-4  hover:underline"
@@ -77,10 +90,11 @@ export function UserDrawer() {
                   <Navbar.Label>Sair</Navbar.Label>
                   <Navbar.Icon
                     className="h-8 w-8 rounded-full p-2 group-hover:bg-primary-foreground/20"
-                    icon={ArrowRight}
+                    icon={ChevronRight}
                   />
                 </Button>
               </Navbar.Item>
+
             </Navbar.Nav>
           </Navbar.Root>
         </div>

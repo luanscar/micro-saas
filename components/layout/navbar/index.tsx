@@ -75,7 +75,7 @@ function NavbarLink({
       onClick={onClick}
       href={href}
       className={cn([
-        "text-muted-foreground transition-all ",
+        "text-muted-foreground transition-all  hover:bg-primary-foreground hover:text-primary flex items-center gap-4 rounded-md px-4 py-2",
         className,
         active && "bg-primary-foreground",
       ])}

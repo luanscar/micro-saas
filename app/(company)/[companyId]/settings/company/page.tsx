@@ -1,28 +1,42 @@
 import { notFound } from "next/navigation";
-import { getUserWithCompanyWithPermissions } from "@/actions/user";
 
 import { getCurrentUser } from "@/lib/session";
-import CompanyDetails from "@/components/forms/company-details";
 import CompanyForm from "@/components/forms/company-form";
 import { Page } from "@/components/layout/page";
+import { getUserWithCompanyWithPermissions } from "@/actions/user";
+import { Company } from "@prisma/client";
+import { prisma } from "@/lib/db";
+import { EmptyPlaceholder } from "@/components/shared/empty-placeholder";
 
-export default async function CompanyPage() {
+type CompanyPageProps = {
+  params: {
+    companyId: string
+  }
+}
+export default async function CompanyPage({ params }: CompanyPageProps) {
   const loggedUser = await getCurrentUser();
 
   if (!loggedUser || !loggedUser.id) return notFound();
 
-  const userDetails = await getUserWithCompanyWithPermissions(loggedUser.id);
+  const company = await prisma.company.findUnique({
+    where: { id: params.companyId }
+  });
 
-  const company = userDetails.company;
+  if (!company || !company.id) {
+
+    return console.log({ error: "Company information is missing" })
+  }
+
+
   return (
     <Page.Root>
-      <Page.Main>
-        <Page.MainContainer>
-          <div>
+      <Page.Container>
+        <Page.Content>
+          <div className="flex-1 max-w-2xl pb-14">
             <CompanyForm data={company} />
           </div>
-        </Page.MainContainer>
-      </Page.Main>
+        </Page.Content>
+      </Page.Container>
     </Page.Root>
   );
 }

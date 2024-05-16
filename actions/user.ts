@@ -1,6 +1,5 @@
 "use server";
 
-import { UsersWithCompanyWithPermissions } from "@/types";
 import { User } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
@@ -24,6 +23,26 @@ export const initUser = async (newUser: Partial<User>) => {
   });
 
   return userData;
+};
+
+
+
+export const getTeamWithMembersByCompany = async (
+  companyId: string,
+) => {
+  const response = await prisma.user.findMany({
+    where: {
+      company: {
+        id: companyId,
+      },
+    },
+    include: {
+      teams: { include: { users: true } },
+      permissions: { include: { companies: true } },
+    },
+  });
+  
+  return response;
 };
 
 export const getUserWithCompanyWithPermissions = async (userId: string) => {

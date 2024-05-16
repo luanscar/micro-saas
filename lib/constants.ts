@@ -183,3 +183,27 @@ export const icons = [
     path: PiClipboardDuotone,
   },
 ];
+
+
+export const mobileLinks = [
+  {
+    id: "1",
+    href: "/settings",
+    name: "Perfil"
+  },
+  {
+    id: "2",
+    href: "/settings/members",
+    name: "Membros"
+  },
+  {
+    id: "3",
+    href: "/companies",
+    name: "Empresas"
+  },
+  {
+    id: "4",
+    href: "/dashboard",
+    name: "Dashboard"
+  }
+]

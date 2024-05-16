@@ -1,10 +1,13 @@
-import { Company, User } from "@prisma/client";
+
+import {  TeamMembersByCompany } from "@/types";
+import { Company, Team, User } from "@prisma/client";
 import { create } from "zustand";
 
 export type ModalType =
   | "createCompany"
   | "invite"
   | "editCompany"
+  | "createTeam"
   | "members"
   | "createUser"
   | "leaveCompany"
@@ -17,6 +20,8 @@ export type ModalType =
 interface ModalData {
   user?: Partial<User>;
   company?: Company;
+  teams?: TeamMembersByCompany;
+  
 }
 
 interface ModalStore {

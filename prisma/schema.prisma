@@ -63,6 +63,7 @@ model User {
   accounts    Account[]
   sessions    Session[]
   permissions Permissions[]
+  teams       Team[]
 
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
@@ -93,8 +94,24 @@ model Company {
   users          User[]
   permissions    Permissions[]
   sidebarOptions CompanySidebarOption[]
+  teams          Team[]
 
   @@map(name: "companies")
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime
+  userId    String?
+  users     User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId String?
+  companies Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([companyId])
+  @@map(name: "team")
 }
 
 model CompanySidebarOption {
@@ -116,7 +133,7 @@ model Permissions {
   email     String
   User      User    @relation(fields: [email], references: [email], onDelete: Cascade)
   companyId String
-  Company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companies Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   access    Boolean
 
   @@index([companyId])

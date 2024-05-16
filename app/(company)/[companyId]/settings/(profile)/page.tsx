@@ -14,10 +14,11 @@ export default async function ProfilePage() {
   return (
     <Page.Root>
       <Page.Container>
-        <ProfileForm userData={userDetails} />
-        <ProfileForm userData={userDetails} />
-        <ProfileForm userData={userDetails} />
-        <ProfileForm userData={userDetails} />
+        <Page.Content>
+          <div className="flex-1 max-w-2xl pb-14">
+            <ProfileForm userData={userDetails} />
+          </div>
+        </Page.Content>
       </Page.Container>
     </Page.Root>
   );

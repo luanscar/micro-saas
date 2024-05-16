@@ -1,9 +1,10 @@
-import { getUserWithCompanyWithPermissions } from "@/actions/user";
+
 import { Prisma, User } from "@prisma/client";
 import type { Icon } from "lucide-react";
 
 import { prisma } from "@/lib/db";
 import { Icons } from "@/components/shared/icons";
+import { getTeamWithMembersByCompany, getUserWithCompanyWithPermissions } from "@/actions/user";
 
 export type NavItem = {
   title: string;
@@ -99,31 +100,25 @@ export type UserDetails = Prisma.PromiseReturnType<
   typeof getUserWithCompanyWithPermissions
 >;
 
-type UserWithCompanyWithPermissions = {
-  id: string;
-  name: string | null;
-  email: string | null;
-  emailVerified: Date | null;
-  image: string | null;
-  role: Role;
-  createdAt: Date;
-  updatedAt: Date;
-  companyId: string | null;
-  stripeCustomerId: string | null;
-  stripeSubscriptionId: string | null;
-  stripePriceId: string | null;
-  stripeCurrentPeriodEnd: Date | null;
-  company: {
-    id: string;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
-    sidebarOptions: CompanySidebarOption[];
-  } | null;
-  permissions: {
-    id: string;
-    email: string;
-    companyId: string;
-    access: boolean;
-  }[];
-};
+const __getTeamWithMembersByCompany = async (
+  companyId: string
+) => {
+  return await prisma.user.findFirst({
+    where: {
+      company: {
+        id: companyId,
+      },
+    },
+    include: {
+      teams: { include: { users: true } },
+      permissions: { include: { companies: true } },
+    },
+  });
+}
+
+export type TeamMembersByCompany =
+  Prisma.PromiseReturnType<
+    typeof __getTeamWithMembersByCompany
+  >
+
+

@@ -12,7 +12,6 @@ import { UserAccountNav } from "./user-account-nav";
 
 export default function DesktopNav() {
   const pathname = usePathname();
-  console.log("path =>", pathname.split("/")[2]);
   const activePath = pathname.split("/")[2];
   const user = useUserStore().getState().data;
   const company = useUserStore().getState().data?.company;

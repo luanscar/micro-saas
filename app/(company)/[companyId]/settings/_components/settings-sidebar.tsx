@@ -2,6 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
+import { Navbar } from "@/components/layout/navbar";
 
 type SettingsSidebarProps = {
   companyId: string;
@@ -15,31 +16,29 @@ export default function SettingsSidebar({ companyId }: SettingsSidebarProps) {
   };
 
   return (
-    <SidebarOld.Root>
-      <SidebarOld.Main className="mt-10">
-        <SidebarOld.Nav>
-          <SidebarOld.NavItem>
-            <SidebarOld.NavLink
-              active={isActive(`/${companyId}/settings`)}
-              href={`/${companyId}/settings`}
-            >
-              <span>Your profile</span>
-            </SidebarOld.NavLink>
-            <SidebarOld.NavLink
-              active={isActive(`/${companyId}/settings/company`)}
-              href={`/${companyId}/settings/company`}
-            >
-              <span>Company</span>
-            </SidebarOld.NavLink>
-            <SidebarOld.NavLink
-              active={isActive(`/${companyId}/settings/team`)}
-              href={`/${companyId}/settings/team`}
-            >
-              <span>Team</span>
-            </SidebarOld.NavLink>
-          </SidebarOld.NavItem>
-        </SidebarOld.Nav>
-      </SidebarOld.Main>
-    </SidebarOld.Root>
+    <Navbar.Root className="hidden h-full flex-col border-r border-border md:flex">
+      <Navbar.Nav className="grow space-y-2 p-4">
+        <Navbar.Item className="flex flex-col space-y-2">
+          <Navbar.Link className=""
+            active={isActive(`/${companyId}/settings`)}
+            href={`/${companyId}/settings`}
+          >
+            <span>Your profile</span>
+          </Navbar.Link>
+          <Navbar.Link
+            active={isActive(`/${companyId}/settings/company`)}
+            href={`/${companyId}/settings/company`}
+          >
+            <span>Company</span>
+          </Navbar.Link>
+          <Navbar.Link
+            active={isActive(`/${companyId}/settings/team`)}
+            href={`/${companyId}/settings/team`}
+          >
+            <span>Team</span>
+          </Navbar.Link>
+        </Navbar.Item>
+      </Navbar.Nav>
+    </Navbar.Root>
   );
 }

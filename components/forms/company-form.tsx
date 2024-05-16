@@ -35,7 +35,7 @@ import { Label } from "../ui/label";
 import { useToast } from "../ui/use-toast";
 
 type CompanyFormProps = {
-  data: Company | null;
+  data: Company;
 };
 
 export default function CompanyForm({ data }: CompanyFormProps) {
@@ -48,6 +48,7 @@ export default function CompanyForm({ data }: CompanyFormProps) {
       companyName: data?.name || "",
     },
   });
+
 
   const onSubmit = async (values: z.infer<typeof companySchema>) => {
     try {
@@ -64,11 +65,15 @@ export default function CompanyForm({ data }: CompanyFormProps) {
             title: "✨ Saved company information!",
             description: "Your company has been created successfully",
           });
+          form.reset()
+          form.setValue("companyName", response.name)
+
         }
 
         if (data?.id) return router.refresh();
         if (response) {
           return router.refresh();
+
         }
       }
     } catch (error) {
@@ -82,7 +87,9 @@ export default function CompanyForm({ data }: CompanyFormProps) {
   };
 
   const isSubmitting = form.formState.isSubmitting;
-  const isDirty = form.formState.isDirty;
+
+  const isDirtyAlt = !!Object.keys(form.formState.dirtyFields).length && data.name !== form.getValues("companyName");
+
 
   return (
     <Card className="mx-auto my-12 w-full max-w-xl rounded-lg bg-primary-foreground">
@@ -137,7 +144,7 @@ export default function CompanyForm({ data }: CompanyFormProps) {
       </CardContent>
       <CardFooter>
         <Button
-          disabled={!isDirty}
+          disabled={!isDirtyAlt}
           onClick={() => form.handleSubmit(onSubmit)()}
           variant="default"
           className="w-full"
