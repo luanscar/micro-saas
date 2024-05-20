@@ -3,6 +3,7 @@ import { getCompanyByUserId } from "@/actions/company";
 
 import { getCurrentUser } from "@/lib/session";
 import CompanyDetails from "@/components/forms/company-details";
+import CompanyForm from "@/components/forms/company-form";
 
 export default async function StartPage() {
   const loggedUser = await getCurrentUser();
@@ -12,7 +13,7 @@ export default async function StartPage() {
   }
 
   const companyDetails = await getCompanyByUserId(loggedUser.id);
-  console.log(companyDetails?.name)
+  console.log(companyDetails?.companyName);
 
   if (companyDetails?.id) {
     return redirect(`/${companyDetails.id}/dashboard`);
@@ -20,9 +21,7 @@ export default async function StartPage() {
 
   return (
     <>
-
-      <CompanyDetails data={companyDetails} />
-
+      <CompanyForm data={companyDetails} />
     </>
   );
 }

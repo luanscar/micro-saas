@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createTeam } from "@/actions/team";
+import { updateTeam } from "@/actions/team";
 import { teamSchema } from "@/schemas";
-import { CompanyWithUsersWithTeams } from "@/types";
+import { TeamWithCompanyWithUsers } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { useForm } from "react-hook-form";
+import { uuid as v4 } from "uuidv4";
 import { z } from "zod";
 
-import { getUsersByCompany } from "@/lib/company";
 import { useModal } from "@/hooks/use-modal-store";
 
 import { Button } from "../ui/button";
@@ -34,50 +32,49 @@ import MultipleSelector, { Option } from "../ui/multiple-selector";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { useToast } from "../ui/use-toast";
 
-export default function CreateTeamModal() {
+export type Member = {
+  label: string;
+  value: string;
+};
+
+export default function EditTeamModal() {
   const { onOpen, isOpen, onClose, type, data } = useModal();
-  const [options, setOptions] = useState<Option[]>([]);
-  const router = useRouter();
+  const [usersTeste, setUsers] = useState<Option[]>([]);
+  const [isMember, setIsMember] = useState<Member[]>([]);
 
-  const isModalOpen = isOpen && type === "createTeam";
-  const { company } = data as { company: CompanyWithUsersWithTeams };
-  // console.log(company);
-
-  useEffect(() => {
-    const getUsers = async () => {
-      const response = await getUsersByCompany();
-
-      const OPTIONS = response.map((user) => ({
-        label: user.name,
-        value: user.id,
-      }));
-      setOptions(OPTIONS as Option[]);
-    };
-    getUsers();
-  }, []);
+  const isModalOpen = isOpen && type === "editTeam";
+  const { team } = data as { team: TeamWithCompanyWithUsers };
+  console.log(team);
 
   const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<z.infer<typeof teamSchema>>({
     resolver: zodResolver(teamSchema),
     mode: "onSubmit",
     defaultValues: {
       name: "",
-      members: [],
+      members: isMember as Member[],
     },
   });
 
   const onSubmit = async (values: z.infer<typeof teamSchema>) => {
     try {
-      const response = await createTeam(
-        values,
-        "105d85e5-bb49-49f7-81e8-d738beffc53b",
+      const response = updateTeam(
+        {
+          id: team?.id ? team?.id : v4(),
+          teamName: values.name,
+          companyId: team?.companyId as string,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        values.members as Member[],
       );
       if (response) {
         toast({
           title: "✨ Saved member information!",
           description: "Member has been updated successfully",
         });
-        form.reset();
+        form.setValue("name", (await response).teamName);
         router.refresh();
         onClose();
       }
@@ -85,10 +82,27 @@ export default function CreateTeamModal() {
       toast({
         variant: "destructive",
         title: "Oppse!",
-        description: "Verifique se já existe uma equipe com esse nome!",
+        description: "could not update your company",
       });
+      console.error(error);
     }
   };
+  useEffect(() => {
+    const users = team?.users.flatMap((user) => ({
+      label: user.user.name,
+      value: user.userId,
+    }));
+
+    const options = team?.companies?.users.flatMap((user) => ({
+      label: user.name,
+      value: user.id,
+    }));
+
+    form.setValue("name", team?.teamName as string);
+    form.setValue("members", users as Member[]);
+    setUsers(options as Option[]);
+    setIsMember(users as Member[]);
+  }, [team, form, setIsMember, setUsers]);
 
   const isSubmitting = form.formState.isSubmitting;
 
@@ -127,6 +141,7 @@ export default function CreateTeamModal() {
                   />
                   <FormField
                     control={form.control}
+                    defaultValue={isMember as Member[]}
                     name="members"
                     render={({ field }) => (
                       <FormItem>
@@ -134,7 +149,8 @@ export default function CreateTeamModal() {
                         <FormControl>
                           <MultipleSelector
                             {...field}
-                            defaultOptions={options}
+                            value={isMember as Member[]}
+                            defaultOptions={usersTeste}
                             placeholder="Selecione os membros..."
                             emptyIndicator={
                               <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">

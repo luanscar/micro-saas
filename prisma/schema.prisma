@@ -63,15 +63,15 @@ model User {
   accounts    Account[]
   sessions    Session[]
   permissions Permissions[]
-  teams       Team[]
 
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
-  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
-  stripePriceId          String?   @map(name: "stripe_price_id")
-  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+  stripeCustomerId       String?        @unique @map(name: "stripe_customer_id")
+  stripeSubscriptionId   String?        @unique @map(name: "stripe_subscription_id")
+  stripePriceId          String?        @map(name: "stripe_price_id")
+  stripeCurrentPeriodEnd DateTime?      @map(name: "stripe_current_period_end")
+  teams                  UsersOnTeams[]
 
   @@index([companyId])
   @@map(name: "users")
@@ -88,7 +88,7 @@ model VerificationToken {
 
 model Company {
   id             String                 @id @default(cuid())
-  name           String
+  companyName    String
   createdAt      DateTime               @default(now()) @map(name: "created_at")
   updatedAt      DateTime               @updatedAt
   users          User[]
@@ -101,17 +101,26 @@ model Company {
 
 model Team {
   id        String   @id @default(cuid())
-  name      String
+  teamName  String   @unique
   createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime
-  userId    String?
-  users     User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  companyId String?
-  companies Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
 
-  @@index([userId])
+  companyId String
+  companies Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  users UsersOnTeams[]
+
   @@index([companyId])
   @@map(name: "team")
+}
+
+model UsersOnTeams {
+  userId String
+  teamId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@id([userId, teamId])
 }
 
 model CompanySidebarOption {

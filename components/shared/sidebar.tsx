@@ -15,9 +15,9 @@ type SidebarProps = {
 export default function Sidebar({ details }: SidebarProps) {
   const isMobile = useMediaQuery().device === "mobile";
 
-  if (!details?.company) return null;
-
   useUserStore().setState({ data: details });
+
+  if (!details?.company) return null;
 
   return <>{isMobile ? <MobileNav /> : <DesktopNav />}</>;
 }

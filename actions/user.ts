@@ -25,24 +25,20 @@ export const initUser = async (newUser: Partial<User>) => {
   return userData;
 };
 
-
-
-export const getTeamWithMembersByCompany = async (
-  companyId: string,
-) => {
-  const response = await prisma.user.findMany({
-    where: {
-      company: {
-        id: companyId,
-      },
-    },
+export const getTeamWithMembersByCompany = async (companyId: string) => {
+  const teams = await prisma.team.findMany({
     include: {
-      teams: { include: { users: true } },
-      permissions: { include: { companies: true } },
+      users: {
+        include: {
+          user: true,
+        },
+      },
+      companies: true,
     },
   });
-  
-  return response;
+
+  console.log(JSON.stringify(teams, null, 2));
+  return teams;
 };
 
 export const getUserWithCompanyWithPermissions = async (userId: string) => {

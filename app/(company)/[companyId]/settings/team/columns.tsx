@@ -1,12 +1,27 @@
 "use client";
 
-import { TeamMembersByCompany } from "@/types";
-import { Permissions, Role, Team, User } from "@prisma/client";
-import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, Edit, MoreHorizontal } from "lucide-react";
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { TeamWithCompanyWithUsers } from "@/types";
+import { Company, Team, User } from "@prisma/client";
+import { Avatar } from "@radix-ui/react-avatar";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { ArrowUpDown, Edit, MoreHorizontal, Trash } from "lucide-react";
 
 import { useModal } from "@/hooks/use-modal-store";
-import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -17,8 +32,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
 
-export const columns: ColumnDef<TeamMembersByCompany>[] = [
+export const columns: ColumnDef<TeamWithCompanyWithUsers>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -42,94 +58,121 @@ export const columns: ColumnDef<TeamMembersByCompany>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    // accessorFn: (row) => row.teams[0].teamName,
+    accessorKey: "teamName",
+    header: "Teams",
     cell: ({ row }) => (
-      <div className="truncate capitalize ">{row.getValue("name")}</div>
+      <div className=" font-medium">{row.getValue("teamName")}</div>
     ),
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "role",
-    header: "Role",
-    cell: ({ row }) => (
-      <Badge className="capitalize">{row.getValue("role")}</Badge>
-    ),
-  },
-  {
-    accessorKey: "permissions",
-    header: "Access",
+    accessorKey: "users",
+    header: "Membros",
     cell: ({ row }) => {
-      const metadata = row.original;
-      const ownedAccounts = metadata?.permissions.filter((per) => per.access);
+      const users = row.original?.companies?.users;
       return (
-        <div className="flex flex-col items-start">
-          <div className="flex flex-col gap-2">
-            {ownedAccounts?.length ? (
-              ownedAccounts.map((i) => (
-                <Badge
-                  key={i.id}
-                  className="w-fit whitespace-nowrap bg-slate-600"
-                >
-                  Access on - {metadata?.name}
-                </Badge>
-              ))
-            ) : (
-              <div className="text-muted-foreground">No Access Yet</div>
-            )}
-          </div>
+        <div className=" flex items-start">
+          {users?.length ? (
+            users.map((user) => (
+              <Avatar key={user.id}>
+                <AvatarImage
+                  className="size-6 rounded-full"
+                  src={user.image as string}
+                />
+              </Avatar>
+            ))
+          ) : (
+            <span>{row.original?.companies?.users[0].name}</span>
+          )}
         </div>
       );
     },
   },
+  { header: "Filas" },
+
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const userData = row.original as Partial<User>;
-      const { onOpen } = useModal();
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              className="flex gap-2"
-              onClick={() => onOpen("upsertUser", { user: userData })}
-            >
-              <Edit size={15} /> Edit User
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(userData.email as string)
-              }
-            >
-              Copy User E-mail
-            </DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      const rowData = row.original;
+
+      return <CellActions rowData={rowData} />;
     },
   },
 ];
+
+interface CellActionsProps {
+  rowData: TeamWithCompanyWithUsers;
+}
+
+const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
+  const { data, onOpen } = useModal();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const user = rowData?.companies?.users.find((user) => user.id);
+  if (!rowData) return;
+  if (!rowData.companies) return;
+
+  return (
+    <AlertDialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="size-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem
+            className="flex gap-2"
+            onClick={() => onOpen("editTeam", { team: rowData })}
+          >
+            <Edit size={15} /> Editar equipe
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+
+          {user?.role !== "ADMIN" && (
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem className="flex gap-2" onClick={() => {}}>
+                <Trash size={15} /> Remove User
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {/* <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-left">
+            Are you absolutely sure?
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-left">
+            This action cannot be undone. This will permanently delete the user
+            and related data.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex items-center">
+          <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            disabled={loading}
+            className="bg-destructive hover:bg-destructive"
+            onClick={async () => {
+              setLoading(true);
+              await deleteUser(rowData.id);
+              toast({
+                title: "Deleted User",
+                description:
+                  "The user has been deleted from this agency they no longer have access to the agency",
+              });
+              setLoading(false);
+              router.refresh();
+            }}
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent> */}
+    </AlertDialog>
+  );
+};

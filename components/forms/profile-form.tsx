@@ -39,7 +39,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { useToast } from "../ui/use-toast";
-import { formatRevalidate } from "next/dist/server/lib/revalidate";
 
 type ProfileFormProps = {
   userData?: Partial<User> | null;
@@ -59,9 +58,7 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
   });
 
   const onSubmit = async (values: z.infer<typeof userSchema>) => {
-
     try {
-
       if (!userData?.id || userData?.id) {
         const response = await upsertUser({
           id: userData?.id || v4(),
@@ -77,11 +74,12 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
             title: "✨ Saved user information!",
             description: "Your user has been saved successfully",
           });
-          form.reset()
-          form.setValue("name", response.name!)
-          form.setValue("email", response.email!)
-        }
 
+          form.reset();
+          form.setValue("name", response.name!);
+          form.setValue("email", response.email!);
+          router.refresh();
+        }
       }
     } catch (error) {
       toast({
@@ -96,7 +94,6 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
   const isSubmitting = form.formState.isSubmitting;
 
   const isDirtyAlt = !!Object.keys(form.formState.dirtyFields).length;
-
 
   const isModerator = userData?.role === Role.MODERATOR;
   return (

@@ -11,7 +11,13 @@ export const userSchema = z.object({
   role: z.enum(["ADMIN", "OWNER", "MODERATOR"]),
   //   role: z.array(z.enum(Role)),
 });
+
+const members = z.object({
+  label: z.string(),
+  value: z.string(),
+  disable: z.boolean().optional(),
+});
 export const teamSchema = z.object({
   name: z.string().min(3, { message: "Team name is required" }),
-  //   role: z.array(z.enum(Role)),
+  members: z.array(members).min(1),
 });

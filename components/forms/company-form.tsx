@@ -45,17 +45,16 @@ export default function CompanyForm({ data }: CompanyFormProps) {
     resolver: zodResolver(companySchema),
     mode: "onSubmit",
     defaultValues: {
-      companyName: data?.name || "",
+      companyName: data?.companyName || "",
     },
   });
-
 
   const onSubmit = async (values: z.infer<typeof companySchema>) => {
     try {
       if (!data?.id || data?.id) {
         const response = await upsertCompany({
           id: data?.id ? data.id : v4(),
-          name: values.companyName.trim(),
+          companyName: values.companyName.trim(),
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -65,15 +64,13 @@ export default function CompanyForm({ data }: CompanyFormProps) {
             title: "✨ Saved company information!",
             description: "Your company has been created successfully",
           });
-          form.reset()
-          form.setValue("companyName", response.name)
-
+          form.reset();
+          form.setValue("companyName", response.companyName);
         }
 
         if (data?.id) return router.refresh();
         if (response) {
           return router.refresh();
-
         }
       }
     } catch (error) {
@@ -87,9 +84,7 @@ export default function CompanyForm({ data }: CompanyFormProps) {
   };
 
   const isSubmitting = form.formState.isSubmitting;
-
-  const isDirtyAlt = !!Object.keys(form.formState.dirtyFields).length && data.name !== form.getValues("companyName");
-
+  const isDirty = form.formState.isDirty;
 
   return (
     <Card className="mx-auto my-12 w-full max-w-xl rounded-lg bg-primary-foreground">
@@ -109,7 +104,7 @@ export default function CompanyForm({ data }: CompanyFormProps) {
                   src="https://avatar.vercel.sh/personal"
                   alt="@shadcn"
                 />
-                <AvatarFallback>{data?.name}</AvatarFallback>
+                <AvatarFallback>{data?.companyName}</AvatarFallback>
               </Avatar>
               <Label
                 htmlFor="file"
@@ -144,7 +139,7 @@ export default function CompanyForm({ data }: CompanyFormProps) {
       </CardContent>
       <CardFooter>
         <Button
-          disabled={!isDirtyAlt}
+          disabled={!isDirty}
           onClick={() => form.handleSubmit(onSubmit)()}
           variant="default"
           className="w-full"
