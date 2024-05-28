@@ -1,30 +1,43 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { notFound } from "next/navigation";
-import { getUserWithCompanyWithPermissions } from "@/actions/user";
+import { getQueueWithUsers } from "@/actions/company";
+import { getUserList, getUserWithCompanyWithPermissions } from "@/actions/user";
+import AppInitializer from "@/providers/app-initializer";
 
 import { getCurrentUser } from "@/lib/session";
 import { Grid } from "@/components/layout/grid";
-import Sidebar from "@/components/shared/sidebar";
+import WaSidebar from "@/components/wa/wa-sidebar";
 
-type CompanyIdProps = {
-  children: React.ReactNode;
+const CompanyIdLayout = async ({
+  children,
+  params,
+}: {
+  children: ReactNode;
   params: { companyId: string };
-};
-
-const CompanyIdLayout = async ({ children, params }: CompanyIdProps) => {
+}) => {
   const loggedUser = await getCurrentUser();
 
   if (!loggedUser || !loggedUser.id) return notFound();
 
-  const details = await getUserWithCompanyWithPermissions(loggedUser.id);
+  const data = await getUserWithCompanyWithPermissions(loggedUser.id);
 
-  if (!details) return null;
+  const userList = await getUserList();
+
+  const queueWithUsers = await getQueueWithUsers();
+
+  // if (queueWithUsers) {
+  //   return <pre>{JSON.stringify(queueWithUsers, null, 2)}</pre>;
+  // }
+
+  if (!data) return null;
 
   return (
-    <Grid cols={1} className="h-screen md:grid-cols-[18rem_1fr]">
-      <Sidebar details={details} />
-      {children}
-    </Grid>
+    <AppInitializer queueList={queueWithUsers} userList={userList}>
+      <Grid cols={1} className="h-screen md:grid-cols-[28rem_1fr]">
+        <WaSidebar companyId={params.companyId} />
+        {children}
+      </Grid>
+    </AppInitializer>
   );
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserStore } from "@/providers/user-store-provider";
+import { useUserStore } from "@/providers/store-provider";
 import { AvatarProps } from "@radix-ui/react-avatar";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

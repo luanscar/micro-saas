@@ -49,3 +49,11 @@ export const updateTeam = async (team: Team, members: Member[]) => {
   });
   return response;
 };
+
+export const deleteTeam = async (teamId: string) => {
+  const response = await prisma.team.delete({
+    where: {
+      id: teamId,
+    },
+  });
+};

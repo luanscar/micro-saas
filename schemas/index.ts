@@ -21,3 +21,7 @@ export const teamSchema = z.object({
   name: z.string().min(3, { message: "Team name is required" }),
   members: z.array(members).min(1),
 });
+export const queueSchema = z.object({
+  queueName: z.string().min(3, { message: "Queue name is required" }),
+  members: z.array(members),
+});

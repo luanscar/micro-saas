@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserStore } from "@/providers/user-store-provider";
+import { useUserStore } from "@/providers/store-provider";
 import { UserDetails } from "@/types";
 
 import useMediaQuery from "@/hooks/use-media-query";

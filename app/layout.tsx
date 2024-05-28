@@ -4,6 +4,7 @@ import { fontHeading, fontSans, fontUrban } from "@/assets/fonts";
 import { Providers } from "@/providers";
 import { ModalProvider } from "@/providers/modal-provider";
 import { ThemeProvider } from "next-themes";
+import { RecoilRoot } from "recoil";
 
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";

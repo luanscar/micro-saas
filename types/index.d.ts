@@ -2,7 +2,14 @@ import {
   getTeamWithMembersByCompany,
   getUserWithCompanyWithPermissions,
 } from "@/actions/user";
-import { Company, Prisma, PrismaClient, User } from "@prisma/client";
+import {
+  Company,
+  Prisma,
+  PrismaClient,
+  Queue,
+  User,
+  UserQueue,
+} from "@prisma/client";
 import type { Icon } from "lucide-react";
 
 import { prisma } from "@/lib/db";
@@ -142,5 +149,32 @@ export type TeamWithCompanyWithUsers = Prisma.PromiseReturnType<
   typeof _getTeamWithCompanyWithUsers
 >;
 
-export type CompanyWithUsersWithTeams = Company &
-  { users: User & { teams: Team } }[];
+const _getUserList = async () => {
+  return await await prisma.user.findMany({});
+};
+
+export type IgetUserList = Prisma.PromiseReturnType<typeof _getUserList>;
+
+const _getQueueWithUsers = async () => {
+  return await prisma.queue.findMany({
+    include: {
+      UserQueue: {
+        include: {
+          user: true,
+        },
+      },
+    },
+    orderBy: {
+      queueName: "asc",
+    },
+  });
+};
+
+export type getQueueWithUsers = Prisma.PromiseReturnType<
+  typeof _getQueueWithUsers
+>;
+
+export type CompanyQueueWithUsers = Company & {
+  queues: (Queue & { userQueues: (UserQueue & { user: User })[] })[];
+  users: User[];
+};

@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, ElementType, ReactEventHandler } from "react";
+import { ElementType } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -75,7 +75,7 @@ function NavbarLink({
       onClick={onClick}
       href={href}
       className={cn([
-        "text-muted-foreground transition-all  hover:bg-primary-foreground hover:text-primary flex items-center gap-4 rounded-md px-4 py-2",
+        "flex items-center  gap-4 rounded-md px-4 py-2 text-muted-foreground transition-all hover:bg-primary-foreground hover:text-primary",
         className,
         active && "bg-primary-foreground",
       ])}
@@ -94,7 +94,7 @@ type NavbarIconProps = {
   icon: ElementType;
 };
 function NavbarIcon({ className, icon: Icon }: NavbarIconProps) {
-  return <Icon className={cn(["h-6 w-6", className])} />;
+  return <Icon className={cn(["size-6", className])} />;
 }
 
 function NavbarItem({ className, children }: NavbarGenericProps) {

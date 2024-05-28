@@ -106,7 +106,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
         className={cn(buttonVariants({ variant: "outline" }))}
         onClick={() => {
           setIsGoogleLoading(true);
-          signIn("google", { redirect: true, callbackUrl: "/start" });
+          signIn("google", { redirect: true, callbackUrl: "/" });
         }}
         disabled={isLoading || isGoogleLoading}
       >

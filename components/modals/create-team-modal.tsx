@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createTeam } from "@/actions/team";
+import { useDataStore } from "@/providers/store-provider";
 import { teamSchema } from "@/schemas";
-import { CompanyWithUsersWithTeams } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Prisma } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { getUsersByCompany } from "@/lib/company";
 import { useModal } from "@/hooks/use-modal-store";
 
 import { Button } from "../ui/button";
@@ -35,26 +32,12 @@ import { Sheet, SheetContent } from "../ui/sheet";
 import { useToast } from "../ui/use-toast";
 
 export default function CreateTeamModal() {
-  const { onOpen, isOpen, onClose, type, data } = useModal();
+  const authUser = useDataStore().getState().data;
+  const { isOpen, onClose, type } = useModal();
   const [options, setOptions] = useState<Option[]>([]);
   const router = useRouter();
 
   const isModalOpen = isOpen && type === "createTeam";
-  const { company } = data as { company: CompanyWithUsersWithTeams };
-  // console.log(company);
-
-  useEffect(() => {
-    const getUsers = async () => {
-      const response = await getUsersByCompany();
-
-      const OPTIONS = response.map((user) => ({
-        label: user.name,
-        value: user.id,
-      }));
-      setOptions(OPTIONS as Option[]);
-    };
-    getUsers();
-  }, []);
 
   const { toast } = useToast();
   const form = useForm<z.infer<typeof teamSchema>>({
@@ -68,18 +51,14 @@ export default function CreateTeamModal() {
 
   const onSubmit = async (values: z.infer<typeof teamSchema>) => {
     try {
-      const response = await createTeam(
-        values,
-        "105d85e5-bb49-49f7-81e8-d738beffc53b",
-      );
+      const response = await createTeam(values, authUser?.companyId as string);
       if (response) {
         toast({
           title: "✨ Saved member information!",
           description: "Member has been updated successfully",
         });
-        form.reset();
         router.refresh();
-        onClose();
+        handleClose();
       }
     } catch (error) {
       toast({
@@ -92,8 +71,23 @@ export default function CreateTeamModal() {
 
   const isSubmitting = form.formState.isSubmitting;
 
+  useEffect(() => {
+    const OPTIONS = [
+      {
+        label: authUser?.name,
+        value: authUser?.id,
+      },
+    ];
+    setOptions(OPTIONS as Option[]);
+  }, [authUser]);
+
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
+
   return (
-    <Sheet open={isModalOpen} onOpenChange={onClose}>
+    <Sheet open={isModalOpen} onOpenChange={handleClose}>
       <SheetContent className="w-full">
         <CardHeader>
           <CardTitle className="mb-2 text-xl font-bold md:text-2xl">

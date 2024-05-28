@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import { getCompanyByUserId } from "@/actions/company";
 
+import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
-import CompanyDetails from "@/components/forms/company-details";
 import CompanyForm from "@/components/forms/company-form";
+import { Page } from "@/components/layout/page";
 
 export default async function StartPage() {
   const loggedUser = await getCurrentUser();
@@ -12,16 +12,29 @@ export default async function StartPage() {
     redirect("/login");
   }
 
-  const companyDetails = await getCompanyByUserId(loggedUser.id);
-  console.log(companyDetails?.companyName);
+  const company = await prisma.company.findFirst({
+    where: {
+      users: {
+        some: {
+          id: loggedUser.id,
+        },
+      },
+    },
+  });
 
-  if (companyDetails?.id) {
-    return redirect(`/${companyDetails.id}/dashboard`);
+  if (company?.id) {
+    return redirect(`/${company.id}/dashboard`);
   }
 
   return (
     <>
-      <CompanyForm data={companyDetails} />
+      <Page.Root>
+        <Page.Container>
+          <Page.Container>
+            <CompanyForm />
+          </Page.Container>
+        </Page.Container>
+      </Page.Root>
     </>
   );
 }

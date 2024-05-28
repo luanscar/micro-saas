@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useUserStore } from "@/providers/user-store-provider";
+import { useUserStore } from "@/providers/store-provider";
 import { Company, User } from "@prisma/client";
 import { CreditCard, LayoutDashboard, LogOut, Settings } from "lucide-react";
 import { signOut } from "next-auth/react";

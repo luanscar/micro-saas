@@ -44,7 +44,6 @@ export default function EditTeamModal() {
 
   const isModalOpen = isOpen && type === "editTeam";
   const { team } = data as { team: TeamWithCompanyWithUsers };
-  console.log(team);
 
   const { toast } = useToast();
   const router = useRouter();

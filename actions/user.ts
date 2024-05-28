@@ -33,11 +33,10 @@ export const getTeamWithMembersByCompany = async (companyId: string) => {
           user: true,
         },
       },
-      companies: true,
+      Company: true,
     },
   });
 
-  console.log(JSON.stringify(teams, null, 2));
   return teams;
 };
 
@@ -58,6 +57,16 @@ export const getUserWithCompanyWithPermissions = async (userId: string) => {
         },
       },
       permissions: true,
+    },
+  });
+
+  return response;
+};
+
+export const createUser = async (user: Partial<User>) => {
+  const response = await prisma.user.create({
+    data: {
+      ...user,
     },
   });
 
@@ -103,4 +112,13 @@ export const getUser = async (id: string) => {
   });
 
   return user;
+};
+
+export const getUserList = async () => {
+  const response = await prisma.user.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+  return response;
 };

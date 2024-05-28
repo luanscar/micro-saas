@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useUserStore } from "@/providers/user-store-provider";
+import { useUserStore } from "@/providers/store-provider";
 
 import { icons } from "@/lib/constants";
 

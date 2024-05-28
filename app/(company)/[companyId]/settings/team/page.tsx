@@ -67,8 +67,6 @@ export default async function TeamPage({ params }: TeamPageProps) {
     },
   });
 
-  console.log(JSON.stringify(teams, null, 2));
-
   return (
     <Page.Root>
       <Page.Container>

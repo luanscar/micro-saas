@@ -1,6 +1,9 @@
 "use client";
 
+import { getRandomValues } from "crypto";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { sendInvitation } from "@/actions/company";
 import { userSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Role, User } from "@prisma/client";
@@ -34,18 +37,21 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "../ui/form";
 import { Sheet, SheetContent } from "../ui/sheet";
 import { useToast } from "../ui/use-toast";
 
-type CreateUserModalProps = {
-  userData?: Partial<User> | null;
-};
+interface SendInvitationProps {
+  companyId: string;
+}
 
-export default function CreateUserModal({ userData }: CreateUserModalProps) {
+export default function CreateUserModal({ companyId }: SendInvitationProps) {
   const { onOpen, isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "createUser";
+
+  const { user } = data;
 
   const { toast } = useToast();
   const router = useRouter();
@@ -53,18 +59,41 @@ export default function CreateUserModal({ userData }: CreateUserModalProps) {
     resolver: zodResolver(userSchema),
     mode: "onSubmit",
     defaultValues: {
-      name: userData?.name as string,
+      name: "",
+      email: "",
+      role: Role.MODERATOR,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof userSchema>) => {
     try {
-      console.log(values);
+      const response = await sendInvitation(
+        values.role,
+        values.email,
+        user?.companyId ?? "",
+      );
+
+      if (response.error) {
+        toast({
+          title: "✨ Ops!",
+          variant: "destructive",
+          description: response.error,
+        });
+      }
+
+      if (response.ok) {
+        toast({
+          title: "✨ Membro criado!",
+          description: "Convite enviado para o e-mail",
+        });
+        onClose();
+        router.refresh();
+      }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Oppse!",
-        description: "could not update your company",
+        description: "",
       });
       console.error(error);
     }
@@ -74,10 +103,14 @@ export default function CreateUserModal({ userData }: CreateUserModalProps) {
 
   const isDirtyAlt = !!Object.keys(form.formState.dirtyFields).length;
 
-  const isModerator = userData?.role === Role.MODERATOR;
+  const handleClose = () => {
+    form.reset();
+    onClose();
+  };
+
   return (
-    <Sheet open={isModalOpen} onOpenChange={onClose}>
-      <SheetContent className="w-full">
+    <Sheet open={isModalOpen} onOpenChange={handleClose}>
+      <SheetContent className="w-full bg-primary-foreground">
         <CardHeader>
           <CardTitle className="mb-2 text-xl font-bold md:text-2xl">
             Membro
@@ -108,12 +141,12 @@ export default function CreateUserModal({ userData }: CreateUserModalProps) {
                 <Input type="file" id="file" className="hidden gap-2" />
               </div>
               <div className="mb-4">
-                <Label htmlFor="nome">Nome</Label>
                 <FormField
                   name="name"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel htmlFor="nome">Nome</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter name"
@@ -127,57 +160,41 @@ export default function CreateUserModal({ userData }: CreateUserModalProps) {
                 />
               </div>
               <div className="mb-4">
-                <Label htmlFor="email">Email</Label>
-
                 <FormField
-                  name="email"
                   control={form.control}
+                  name="email"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex-1">
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter email"
-                          {...field}
-                          disabled={isSubmitting && userData?.role === "ADMIN"}
-                        />
+                        <Input placeholder="Email" {...field} />
                       </FormControl>
-                      <Badge
-                        className="text-muted-foreground"
-                        variant="secondary"
-                      >
-                        Certifique-se de usar um endereço de email válido.
-                      </Badge>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
               <div className="mb-4">
-                <Label htmlFor="role">Função</Label>
                 <FormField
                   name="role"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem>
-                      {/* <FormLabel>User Role: {data.user?.role}</FormLabel> */}
-
+                      <FormLabel>Função</FormLabel>
                       <Select
                         disabled={field.value === "OWNER"}
-                        defaultValue={userData?.role}
                         onValueChange={field.onChange}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select user role..." />
+                            <SelectValue placeholder="Função do membro..." />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           <SelectItem disabled={true} value="OWNER">
                             User Owner
                           </SelectItem>
-                          <SelectItem disabled={isModerator} value="ADMIN">
-                            Admin
-                          </SelectItem>
+                          <SelectItem value="ADMIN">Admin</SelectItem>
                           <SelectItem value="MODERATOR">Moderator</SelectItem>
                         </SelectContent>
                       </Select>

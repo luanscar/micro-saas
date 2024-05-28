@@ -1,15 +1,16 @@
 "use client";
 
+import { randomInt } from "crypto";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { upsertCompany } from "@/actions/company";
+import { createCompany, upsertCompany } from "@/actions/company";
 import { initUser } from "@/actions/user";
 import { companySchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Company } from "@prisma/client";
 import { Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { uuid as v4 } from "uuidv4";
+import { uuid, uuid as v4 } from "uuidv4";
 import { z } from "zod";
 
 import {
@@ -17,6 +18,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
@@ -35,7 +37,7 @@ import { Label } from "../ui/label";
 import { useToast } from "../ui/use-toast";
 
 type CompanyFormProps = {
-  data: Company;
+  data?: Company;
 };
 
 export default function CompanyForm({ data }: CompanyFormProps) {
@@ -49,14 +51,17 @@ export default function CompanyForm({ data }: CompanyFormProps) {
     },
   });
 
+  useEffect(() => {
+    if (data) {
+      form.setValue("companyName", data.companyName);
+    }
+  }, [form, data]);
+
   const onSubmit = async (values: z.infer<typeof companySchema>) => {
     try {
       if (!data?.id || data?.id) {
-        const response = await upsertCompany({
-          id: data?.id ? data.id : v4(),
+        const response = await createCompany({
           companyName: values.companyName.trim(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
         });
 
         if (response) {
@@ -64,9 +69,10 @@ export default function CompanyForm({ data }: CompanyFormProps) {
             title: "✨ Saved company information!",
             description: "Your company has been created successfully",
           });
-          form.reset();
-          form.setValue("companyName", response.companyName);
+          router.refresh();
         }
+
+        const newUserData = await initUser({ role: "OWNER" });
 
         if (data?.id) return router.refresh();
         if (response) {
@@ -85,6 +91,7 @@ export default function CompanyForm({ data }: CompanyFormProps) {
 
   const isSubmitting = form.formState.isSubmitting;
   const isDirty = form.formState.isDirty;
+  const isDirtyAlt = !!Object.keys(form.formState.dirtyFields).length;
 
   return (
     <Card className="mx-auto my-12 w-full max-w-xl rounded-lg bg-primary-foreground">
@@ -98,9 +105,9 @@ export default function CompanyForm({ data }: CompanyFormProps) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="mb-4 flex items-center gap-2">
-              <Avatar className="h-9 w-9 rounded-md object-cover">
+              <Avatar className="size-9 rounded-md object-cover">
                 <AvatarImage
-                  className="h-9 w-9 rounded-md object-cover"
+                  className="size-9 rounded-md object-cover"
                   src="https://avatar.vercel.sh/personal"
                   alt="@shadcn"
                 />
@@ -116,12 +123,12 @@ export default function CompanyForm({ data }: CompanyFormProps) {
               <Input type="file" id="file" className="hidden gap-2" />
             </div>
             <div className="mb-4">
-              <Label htmlFor="nome">Nome</Label>
               <FormField
                 name="companyName"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel htmlFor="nome">Nome</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter name"
@@ -139,7 +146,7 @@ export default function CompanyForm({ data }: CompanyFormProps) {
       </CardContent>
       <CardFooter>
         <Button
-          disabled={!isDirty}
+          disabled={!isDirtyAlt}
           onClick={() => form.handleSubmit(onSubmit)()}
           variant="default"
           className="w-full"

@@ -36,6 +36,7 @@ import {
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "../ui/form";
 import { useToast } from "../ui/use-toast";
@@ -53,7 +54,7 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
     defaultValues: {
       name: userData?.name as string,
       email: userData?.email as string,
-      role: userData?.role || Role.MODERATOR,
+      role: userData?.role || Role.ADMIN,
     },
   });
 
@@ -108,9 +109,9 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="mb-4 flex items-center gap-2">
-              <Avatar className="h-9 w-9 rounded-md object-cover">
+              <Avatar className="size-9 rounded-md object-cover">
                 <AvatarImage
-                  className="h-9 w-9 rounded-md object-cover"
+                  className="size-9 rounded-md object-cover"
                   src="https://avatar.vercel.sh/personal"
                   alt="@shadcn"
                 />
@@ -126,12 +127,12 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
               <Input type="file" id="file" className="hidden gap-2" />
             </div>
             <div className="mb-4">
-              <Label htmlFor="nome">Nome</Label>
               <FormField
                 name="name"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel htmlFor="nome">Nome</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter name"
@@ -145,13 +146,13 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
               />
             </div>
             <div className="mb-4">
-              <Label htmlFor="email">Email</Label>
-
               <FormField
                 name="email"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel htmlFor="email">Email</FormLabel>
+
                     <FormControl>
                       <Input
                         placeholder="Enter email"
@@ -171,14 +172,12 @@ export default function ProfileForm({ userData }: ProfileFormProps) {
               />
             </div>
             <div className="mb-4">
-              <Label htmlFor="role">Função</Label>
               <FormField
                 name="role"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    {/* <FormLabel>User Role: {data.user?.role}</FormLabel> */}
-
+                    <FormLabel htmlFor="role">Função</FormLabel>
                     <Select
                       disabled={field.value === "OWNER"}
                       defaultValue={userData?.role}

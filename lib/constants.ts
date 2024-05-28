@@ -1,3 +1,4 @@
+import { ShieldHalf, StarHalf, Users } from "lucide-react";
 import {
   PiCalendarCheckDuotone,
   PiChartPieSliceDuotone,
@@ -182,28 +183,37 @@ export const icons = [
     label: "Clipboard Icon",
     path: PiClipboardDuotone,
   },
+  {
+    value: "teams",
+    label: "Teams",
+    path: ShieldHalf,
+  },
+  {
+    value: "members",
+    label: "Members",
+    path: Users,
+  },
 ];
-
 
 export const mobileLinks = [
   {
     id: "1",
     href: "/settings",
-    name: "Perfil"
+    name: "Perfil",
   },
   {
     id: "2",
     href: "/settings/members",
-    name: "Membros"
+    name: "Membros",
   },
   {
     id: "3",
     href: "/companies",
-    name: "Empresas"
+    name: "Empresas",
   },
   {
     id: "4",
     href: "/dashboard",
-    name: "Dashboard"
-  }
-]
+    name: "Dashboard",
+  },
+];

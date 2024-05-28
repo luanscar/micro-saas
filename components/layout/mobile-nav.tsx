@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserStore } from "@/providers/user-store-provider";
+import { useUserStore } from "@/providers/store-provider";
 
 import { icons } from "@/lib/constants";
 
@@ -20,7 +20,10 @@ export function MobileNav() {
             val = <result.path className="h-8 w-8" />;
           }
           return (
-            <Navbar.Item key={s.id} className="flex items-center justify-center">
+            <Navbar.Item
+              key={s.id}
+              className="flex items-center justify-center"
+            >
               <Navbar.Link
                 href={`/${company?.id}/${s.name.toLocaleLowerCase()}`}
               >

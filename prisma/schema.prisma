@@ -72,6 +72,7 @@ model User {
   stripePriceId          String?        @map(name: "stripe_price_id")
   stripeCurrentPeriodEnd DateTime?      @map(name: "stripe_current_period_end")
   teams                  UsersOnTeams[]
+  userQueues             UserQueue[]
 
   @@index([companyId])
   @@map(name: "users")
@@ -95,8 +96,34 @@ model Company {
   permissions    Permissions[]
   sidebarOptions CompanySidebarOption[]
   teams          Team[]
+  invitations    Invitation[]
+  queues         Queue[]
 
   @@map(name: "companies")
+}
+
+model Queue {
+  id        String  @id @default(cuid())
+  queueName String
+  companyId String
+  Company   Company @relation(fields: [companyId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userQueues UserQueue[]
+
+  @@index([companyId])
+  @@map(name: "queues")
+}
+
+model UserQueue {
+  userId  String
+  queueId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  queue   Queue  @relation(fields: [queueId], references: [id], onDelete: Cascade)
+
+  @@id([userId, queueId])
 }
 
 model Team {
@@ -106,7 +133,7 @@ model Team {
   updatedAt DateTime @default(now()) @map(name: "updated_at")
 
   companyId String
-  companies Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  Company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   users UsersOnTeams[]
 
@@ -148,6 +175,23 @@ model Permissions {
   @@index([companyId])
   @@index([email])
   @@map(name: "permissions")
+}
+
+enum InvitationStatus {
+  ACCEPTED
+  REVOKED
+  PENDING
+}
+
+model Invitation {
+  id        String           @id @default(uuid())
+  email     String           @unique
+  companyId String
+  Company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  status    InvitationStatus @default(PENDING)
+  role      Role             @default(MODERATOR)
+
+  @@index([companyId])
 }
 
 enum Icon {

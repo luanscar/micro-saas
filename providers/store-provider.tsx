@@ -1,4 +1,5 @@
 import { createContext, PropsWithChildren, useContext, useRef } from "react";
+import { createDataStore } from "@/stores/use-data-store";
 import { createUserStore, StoreData } from "@/stores/user-store";
 import type { StoreApi } from "zustand";
 import { useStoreWithEqualityFn } from "zustand/traditional";
@@ -17,29 +18,29 @@ export type ZustandStore<T> = WithReact<StoreApi<T>>;
 
 type StoreType = ZustandStore<StoreData>;
 
-const UserStoreContext = createContext<StoreType>(null!);
+const StoreContext = createContext<StoreType>(null!);
 
-export const UserStoreProvider = ({ children }: PropsWithChildren) => {
+export const StoreProvider = ({ children }: PropsWithChildren) => {
   const storeRef = useRef<StoreType>();
   if (!storeRef.current) {
-    storeRef.current = createUserStore();
+    storeRef.current = createDataStore();
   }
   return (
-    <UserStoreContext.Provider value={storeRef.current}>
+    <StoreContext.Provider value={storeRef.current}>
       {children}
-    </UserStoreContext.Provider>
+    </StoreContext.Provider>
   );
 };
 
 export function useStoreInContext<U>(
   selector: (state: ExtractState<StoreType>) => U,
 ) {
-  const store = useContext(UserStoreContext);
+  const store = useContext(StoreContext);
   if (!store) throw "Missing StoreProvider";
 
   return useStoreWithEqualityFn(store, selector);
 }
 
-export function useUserStore() {
-  return useContext(UserStoreContext);
+export function useDataStore() {
+  return useContext(StoreContext);
 }

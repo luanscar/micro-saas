@@ -1,13 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { deleteTeam } from "@/actions/team";
 import { TeamWithCompanyWithUsers } from "@/types";
-import { Company, Team, User } from "@prisma/client";
-import { Avatar } from "@radix-ui/react-avatar";
-import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { ArrowUpDown, Edit, MoreHorizontal, Trash } from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
+import { Edit, MoreHorizontal, Trash } from "lucide-react";
 
 import { useModal } from "@/hooks/use-modal-store";
 import {
@@ -21,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -36,29 +34,6 @@ import { useToast } from "@/components/ui/use-toast";
 
 export const columns: ColumnDef<TeamWithCompanyWithUsers>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    // accessorFn: (row) => row.teams[0].teamName,
     accessorKey: "teamName",
     header: "Teams",
     cell: ({ row }) => (
@@ -73,22 +48,24 @@ export const columns: ColumnDef<TeamWithCompanyWithUsers>[] = [
       return (
         <div className=" flex items-start">
           {users?.length ? (
-            users.map((user) => (
-              <Avatar key={user.id}>
-                <AvatarImage
-                  className="size-6 rounded-full"
-                  src={user.image as string}
-                />
-              </Avatar>
-            ))
+            users.map((user) =>
+              user.image ? (
+                <Avatar key={user.id} className="size-6">
+                  <AvatarImage src={user.image as string} />
+                </Avatar>
+              ) : (
+                <Avatar key={user.id} className="size-6">
+                  <AvatarFallback>{user.name?.substring(1, -1)}</AvatarFallback>
+                </Avatar>
+              ),
+            )
           ) : (
-            <span>{row.original?.companies?.users[0].name}</span>
+            <span>No image</span>
           )}
         </div>
       );
     },
   },
-  { header: "Filas" },
 
   {
     id: "actions",
@@ -136,32 +113,32 @@ const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
           {user?.role !== "ADMIN" && (
             <AlertDialogTrigger asChild>
               <DropdownMenuItem className="flex gap-2" onClick={() => {}}>
-                <Trash size={15} /> Remove User
+                <Trash size={15} /> Apagar Equipe
               </DropdownMenuItem>
             </AlertDialogTrigger>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      {/* <AlertDialogContent>
+      <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-left">
             Are you absolutely sure?
           </AlertDialogTitle>
           <AlertDialogDescription className="text-left">
-            This action cannot be undone. This will permanently delete the user
+            This action cannot be undone. This will permanently delete the team
             and related data.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex items-center">
-          <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             disabled={loading}
-            className="bg-destructive hover:bg-destructive"
+            className="bg-destructive text-secondary-foreground hover:bg-destructive"
             onClick={async () => {
               setLoading(true);
-              await deleteUser(rowData.id);
+              await deleteTeam(rowData.id);
               toast({
-                title: "Deleted User",
+                title: "Deleted Team",
                 description:
                   "The user has been deleted from this agency they no longer have access to the agency",
               });
@@ -172,7 +149,7 @@ const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>
-      </AlertDialogContent> */}
+      </AlertDialogContent>
     </AlertDialog>
   );
 };
